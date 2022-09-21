@@ -41,7 +41,7 @@ export function SelectCategories() {
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    const handleDown = ({ key }: KeyboardEvent) => {
+    const handleDown = () => {
       buttonRef.current?.blur();
     };
     window.addEventListener('keydown', handleDown);
@@ -55,7 +55,7 @@ export function SelectCategories() {
       <Box>
         <Button
           ref={buttonRef}
-          onClick={(e) => {
+          onClick={() => {
             send('OPEN');
           }}
         >

@@ -10,14 +10,14 @@ type Props = {
 export function Categories({ onClick }: Props) {
   return (
     <ListHandler>
-      {LIST_CATEGORIES.map((val) => (
+      {LIST_CATEGORIES.map((val, index) => (
         <Box
-          onClick={(e) => {
+          onClick={() => {
             onClick(val);
           }}
           w="100%"
           p="4"
-          key={val}
+          key={`${val} ${index}`}
         >
           <Text>{val}</Text>
         </Box>

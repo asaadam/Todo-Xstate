@@ -1,14 +1,14 @@
 import { Box, VStack } from '@chakra-ui/react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useMachine } from '@xstate/react';
 import { counterMachine } from './CounterMachine';
 import React from 'react';
+
 type Props = {
   children: Array<React.ReactNode>;
 };
 
 export function ListHandler({ children }: Props) {
-  const [selectedIndex, setSelectedIndex] = useState<number | undefined>();
   const [state, send] = useMachine(counterMachine);
   const buttonRef = useRef<HTMLDivElement>(null);
 
@@ -40,41 +40,25 @@ export function ListHandler({ children }: Props) {
     return () => {
       window.removeEventListener('keydown', downHandlerXstate);
     };
-  }, [
-    selectedIndex,
-    setSelectedIndex,
-    children,
-    send,
-    state.value,
-    state.context.count,
-    buttonRef,
-  ]);
+  }, [children, send, state.value, state.context.count, buttonRef]);
 
   return (
     <VStack w="100%">
-      {React.Children.map(children, (child, index) => {
-        if (React.isValidElement(child)) {
-          {
-            console.log(index === state.context.count);
+      {children.map((data, index) => (
+        <Box
+          ref={index === state.context.count ? buttonRef : null}
+          w="100%"
+          onMouseEnter={() => {
+            send('SELECTED', { value: index });
+          }}
+          backgroundColor={
+            index === state.context.count ? 'gray.400' : 'gray.200'
           }
-          return (
-            <Box
-              ref={index === state.context.count ? buttonRef : null}
-              w="100%"
-              onMouseEnter={() => {
-                setSelectedIndex(index);
-                send('SELECTED', { value: index });
-              }}
-              backgroundColor={
-                index === state.context.count ? 'gray.400' : 'gray.200'
-              }
-              key={index}
-            >
-              {child}
-            </Box>
-          );
-        }
-      })}
+          key={index}
+        >
+          {data}
+        </Box>
+      ))}
     </VStack>
   );
 }
