@@ -26,10 +26,11 @@ export function ListHandler({ children }: Props) {
         if (key === 'ArrowUp' && state.context.count! > 0) {
           send('DECREMENT');
         }
-        if (key === 'Enter' && state.context.count) {
+        if (key === 'Enter') {
           if (buttonRef.current?.children[0]) {
             const button = buttonRef.current?.children[0] as HTMLElement | null;
             if (button) {
+              console.log('click');
               button.click();
             }
           }
