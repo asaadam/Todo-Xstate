@@ -4,16 +4,17 @@ import { ListHandler } from './ListHandler';
 const LIST_CATEGORIES = ['Design', 'Programming', 'Marketing', 'Finance'];
 
 type Props = {
-  onClick: (val: string) => void;
+  onClick: (val: string, index: number) => void;
+  defaultSelectedIndex?: number;
 };
 
-export function Categories({ onClick }: Props) {
+export function Categories({ onClick, defaultSelectedIndex }: Props) {
   return (
-    <ListHandler>
+    <ListHandler defaultSelectedIndex={defaultSelectedIndex}>
       {LIST_CATEGORIES.map((val, index) => (
         <Box
           onClick={() => {
-            onClick(val);
+            onClick(val, index);
           }}
           w="100%"
           p="4"

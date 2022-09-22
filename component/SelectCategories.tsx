@@ -7,15 +7,19 @@ import { useEffect, useRef } from 'react';
 
 interface CategoriesContext {
   selected?: string;
+  index?: number;
 }
 
-type CategoriesEvent = { type: 'OPEN' } | { type: 'SELECTED'; value: string };
+type CategoriesEvent =
+  | { type: 'OPEN' }
+  | { type: 'SELECTED'; value: { selected: string; index: number } };
 
 const categoriesMachine = createMachine<CategoriesContext, CategoriesEvent>({
   id: 'categoriesSelector',
   initial: 'close',
   context: {
     selected: '',
+    index: undefined,
   },
   states: {
     close: {
@@ -27,7 +31,8 @@ const categoriesMachine = createMachine<CategoriesContext, CategoriesEvent>({
       on: {
         SELECTED: {
           actions: assign({
-            selected: (_, event) => event.value,
+            selected: (_, event) => event.value.selected,
+            index: (_, event) => event.value.index,
           }),
           target: 'close',
         },
@@ -63,9 +68,16 @@ export function SelectCategories() {
           <ChevronDownIcon />
         </Button>
       </Box>
-      {state.value === 'open' && (
-        <Categories onClick={(val) => send('SELECTED', { value: val })} />
-      )}
+      <Box width="100%" height="150px" overflowY="auto">
+        {state.value === 'open' && (
+          <Categories
+            defaultSelectedIndex={state.context.index}
+            onClick={(val, index) =>
+              send('SELECTED', { value: { selected: val, index: index } })
+            }
+          />
+        )}
+      </Box>
     </VStack>
   );
 }
