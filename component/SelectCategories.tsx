@@ -4,6 +4,7 @@ import { createMachine, assign } from 'xstate';
 import { useMachine } from '@xstate/react';
 import { useRef } from 'react';
 import { ListHandler } from './ListHandler';
+import { useOnClickOutside } from '../hooks/useOnClickOutside';
 
 const LIST_CATEGORIES = ['Design', 'Programming', 'Marketing', 'Finance'];
 
@@ -14,6 +15,7 @@ interface CategoriesContext {
 
 type CategoriesEvent =
   | { type: 'OPEN' }
+  | { type: 'CLOSE' }
   | { type: 'SELECTED'; value: { selected: string; index: number } };
 
 const categoriesMachine = createMachine<CategoriesContext, CategoriesEvent>({
@@ -38,7 +40,6 @@ const categoriesMachine = createMachine<CategoriesContext, CategoriesEvent>({
           }),
           target: 'close',
         },
-        OPEN: 'close',
       },
     },
   },
@@ -48,6 +49,8 @@ export function SelectCategories() {
   const [state, send] = useMachine(categoriesMachine);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const ulRef = useRef(null);
+  useOnClickOutside(ulRef, () => send('OPEN'));
+
   return (
     <VStack w="lg">
       <Button
