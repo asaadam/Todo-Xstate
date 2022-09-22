@@ -1,9 +1,11 @@
 import { Box, Button, Text, VStack } from '@chakra-ui/react';
-import { Categories } from './Categories';
 import { ChevronDownIcon } from '@chakra-ui/icons';
 import { createMachine, assign } from 'xstate';
 import { useMachine } from '@xstate/react';
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
+import { ListHandler } from './ListHandler';
+
+const LIST_CATEGORIES = ['Design', 'Programming', 'Marketing', 'Finance'];
 
 interface CategoriesContext {
   selected?: string;
@@ -41,41 +43,49 @@ const categoriesMachine = createMachine<CategoriesContext, CategoriesEvent>({
     },
   },
 });
+
 export function SelectCategories() {
   const [state, send] = useMachine(categoriesMachine);
   const buttonRef = useRef<HTMLButtonElement>(null);
-
-  useEffect(() => {
-    const handleDown = () => {
-      buttonRef.current?.blur();
-    };
-    window.addEventListener('keydown', handleDown);
-    return () => {
-      window.removeEventListener('keydown', handleDown);
-    };
-  }, [buttonRef]);
-
+  const ulRef = useRef(null);
   return (
     <VStack w="lg">
-      <Box>
-        <Button
-          ref={buttonRef}
-          onClick={() => {
-            send('OPEN');
-          }}
-        >
-          <Text>{state.context.selected || 'Categories'}</Text>
-          <ChevronDownIcon />
-        </Button>
-      </Box>
+      <Button
+        onKeyDown={(e) => {
+          if (e.keyCode === 40) {
+            const ulEl = ulRef.current as unknown as HTMLElement;
+            if (ulEl) {
+              const liEl = ulEl.children[0] as HTMLElement;
+              if (liEl) {
+                liEl.focus();
+              }
+            }
+          }
+        }}
+        ref={buttonRef}
+        onClick={() => {
+          send('OPEN');
+        }}
+      >
+        <Text>{state.context.selected || 'Categories'}</Text>
+        <ChevronDownIcon />
+      </Button>
       <Box width="100%" height="150px" overflowY="auto">
         {state.value === 'open' && (
-          <Categories
-            defaultSelectedIndex={state.context.index}
-            onClick={(val, index) =>
-              send('SELECTED', { value: { selected: val, index: index } })
-            }
-          />
+          <ListHandler ref={ulRef} defaultSelectedIndex={state.context.index}>
+            {LIST_CATEGORIES.map((val, index) => (
+              <Box
+                onClick={() => {
+                  send('SELECTED', { value: { selected: val, index: index } });
+                }}
+                w="100%"
+                p="4"
+                key={`${val} ${index}`}
+              >
+                <Text>{val}</Text>
+              </Box>
+            ))}
+          </ListHandler>
         )}
       </Box>
     </VStack>
