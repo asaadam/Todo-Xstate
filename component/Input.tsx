@@ -89,44 +89,45 @@ export function CustomInput() {
         </HStack>
         {stateInput.value === 'categoriesSelected' && (
           <ListHandler ref={ulRef}>
-            {!filteredCategory.length && (
-              <Box
-                p="4"
-                onClick={() =>
-                  addCategory(stateInput.context.text.split('@')[1])
-                }
-                key={'newData'}
-              >
-                <Text>
-                  Add{' '}
-                  <Text as={'span'} textColor={'red.400'}>
-                    {stateInput.context.text.split('@')[1]}{' '}
-                  </Text>
-                  to category
-                </Text>
-              </Box>
-            )}
-            {filteredCategory.map((val, index) => {
-              return (
-                <Box
-                  onClick={() => {
-                    send('SELECTED', {
-                      value: { selected: val, index: index },
-                    });
-                    sendInput('SELECTING_CATEGORY');
-                    if (inputRef.current) {
-                      const currentRef = inputRef.current as HTMLElement;
-                      currentRef.focus();
+            {filteredCategory.length > 0
+              ? filteredCategory.map((val, index) => {
+                  return (
+                    <Box
+                      onClick={() => {
+                        send('SELECTED', {
+                          value: { selected: val, index: index },
+                        });
+                        sendInput('SELECTING_CATEGORY');
+                        if (inputRef.current) {
+                          const currentRef = inputRef.current as HTMLElement;
+                          currentRef.focus();
+                        }
+                      }}
+                      w="100%"
+                      p="4"
+                      key={`${val} ${index}`}
+                    >
+                      <Text>{val}</Text>
+                    </Box>
+                  );
+                })
+              : [
+                  <Box
+                    p="4"
+                    onClick={() =>
+                      addCategory(stateInput.context.text.split('@')[1])
                     }
-                  }}
-                  w="100%"
-                  p="4"
-                  key={`${val} ${index}`}
-                >
-                  <Text>{val}</Text>
-                </Box>
-              );
-            })}
+                    key={'newData'}
+                  >
+                    <Text>
+                      Add{' '}
+                      <Text as={'span'} textColor={'red.400'}>
+                        {stateInput.context.text.split('@')[1]}{' '}
+                      </Text>
+                      to category
+                    </Text>
+                  </Box>,
+                ]}
           </ListHandler>
         )}
       </Box>
