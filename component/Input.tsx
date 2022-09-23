@@ -1,4 +1,4 @@
-import { Box, HStack, Text, Tooltip } from '@chakra-ui/react';
+import { Box, HStack, Text, Tooltip, useToast } from '@chakra-ui/react';
 import { Input } from '@chakra-ui/react';
 import { useMachine, useSelector } from '@xstate/react';
 import { useEffect, useRef } from 'react';
@@ -9,7 +9,7 @@ import { QuestionIcon } from '@chakra-ui/icons';
 import { useGlobalStore } from '../store/globalStore';
 
 export function CustomInput() {
-  const { categories, addCategory } = useGlobalStore();
+  const { categories, addCategory, addTask, addTitle } = useGlobalStore();
   const [stateInput, sendInput] = useMachine(inputMachine);
   const { service } = useCategories();
   const filteredCategory = useSelector(
@@ -17,9 +17,15 @@ export function CustomInput() {
     (state) => state.context.categories
   );
 
+  const selectedCategories = useSelector(
+    service,
+    (state) => state.context.selected
+  );
+
   const { send } = service;
   const inputRef = useRef(null);
   const ulRef = useRef(null);
+  const toast = useToast();
 
   useEffect(() => {
     if (categories) {
@@ -44,7 +50,9 @@ export function CustomInput() {
         });
       }
     } else {
-      sendInput('TYPING');
+      sendInput('TYPING', {
+        value: stateInput.context.text,
+      });
     }
   }, [
     stateInput.context.text,
@@ -55,44 +63,54 @@ export function CustomInput() {
   ]);
 
   return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-      }}
-    >
-      <Box>
-        <HStack>
-          <Input
-            value={stateInput.context.text}
-            onKeyDown={(e) => {
-              if (e.keyCode === 40) {
-                const ulEl = ulRef.current as unknown as HTMLElement;
-                if (ulEl) {
-                  const liEl = ulEl.children[0] as HTMLElement;
-                  if (liEl) {
-                    liEl.focus();
-                  }
+    <Box position="relative">
+      <HStack>
+        <Input
+          value={stateInput.context.text}
+          onKeyDown={(e) => {
+            if (e.keyCode === 40) {
+              const ulEl = ulRef.current as unknown as HTMLElement;
+              if (ulEl) {
+                const liEl = ulEl.children[0] as HTMLElement;
+                if (liEl) {
+                  liEl.focus();
                 }
               }
-            }}
-            ref={inputRef}
-            onChange={(e) => {
-              sendInput('TYPING', { value: e.target.value });
-            }}
-          />
-          <Tooltip
-            label="Try type @, and you can choose category"
-            fontSize="md"
-          >
-            <QuestionIcon />
-          </Tooltip>
-        </HStack>
+            }
+            if (e.key === 'Enter') {
+              if (selectedCategories) {
+                addTask({
+                  categories: selectedCategories!,
+                  isDone: false,
+                  title: stateInput.context.text,
+                });
+                return sendInput('SUBMIT');
+              }
+              toast({
+                title: 'Error',
+                description: 'Please select categories first',
+                status: 'error',
+              });
+            }
+          }}
+          ref={inputRef}
+          onChange={(e) => {
+            sendInput('TYPING', { value: e.target.value });
+          }}
+        />
+        <Tooltip label="Try type @, and you can choose category" fontSize="md">
+          <QuestionIcon />
+        </Tooltip>
+      </HStack>
+      <Box position="absolute" backgroundColor="gray.300" zIndex={4}>
         {stateInput.value === 'categoriesSelected' && (
           <ListHandler ref={ulRef} prevRef={inputRef}>
             {filteredCategory.length > 0
               ? filteredCategory.map((val, index) => {
                   return (
                     <Box
+                      _hover={{ backgroundColor: 'gray.400' }}
+                      _focus={{ backgroundColor: 'gray.400' }}
                       onClick={() => {
                         send('SELECTED', {
                           value: { selected: val, index: index },
@@ -113,6 +131,8 @@ export function CustomInput() {
                 })
               : [
                   <Box
+                    _hover={{ backgroundColor: 'gray.400' }}
+                    _focus={{ backgroundColor: 'gray.400' }}
                     p="4"
                     onClick={() =>
                       addCategory(stateInput.context.text.split('@')[1])
@@ -131,6 +151,6 @@ export function CustomInput() {
           </ListHandler>
         )}
       </Box>
-    </form>
+    </Box>
   );
 }

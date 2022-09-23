@@ -69,6 +69,8 @@ export function SelectCategories({ variant = 'default' }: Props) {
           <ListHandler ref={ulRef} defaultSelectedIndex={index}>
             {categories.map((val, index) => (
               <Box
+                _hover={{ backgroundColor: 'gray.400' }}
+                _focus={{ backgroundColor: 'gray.400' }}
                 onClick={() => {
                   send('SELECTED', {
                     value: { selected: val, index: index },

@@ -16,7 +16,8 @@ type CategoriesEvent =
     }
   | {
       type: 'SELECTING_CATEGORY';
-    };
+    }
+  | { type: 'SUBMIT' };
 
 const inputMachine = createMachine<CategoriesContext, CategoriesEvent>({
   id: 'categoriesSelector',
@@ -36,6 +37,9 @@ const inputMachine = createMachine<CategoriesContext, CategoriesEvent>({
         TYPING_CATEGORY: {
           target: 'categoriesSelected',
         },
+        SUBMIT: {
+          actions: assign({ text: (ctx) => '' }),
+        },
       },
     },
     categoriesSelected: {
@@ -44,6 +48,7 @@ const inputMachine = createMachine<CategoriesContext, CategoriesEvent>({
           actions: assign({
             text: (_, event) => event.value,
           }),
+
           target: 'start',
         },
         TYPING_CATEGORY: {

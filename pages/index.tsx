@@ -3,6 +3,7 @@ import type { NextPage } from 'next';
 import Head from 'next/head';
 import { CustomInput } from '../component/Input';
 import { SelectCategories } from '../component/SelectCategories';
+import { TaskList } from '../component/TaskList';
 
 const Home: NextPage = () => {
   return (
@@ -21,6 +22,7 @@ const Home: NextPage = () => {
       >
         <SelectCategories />
         <CustomInput />
+        <TaskList />
       </VStack>
     </>
   );

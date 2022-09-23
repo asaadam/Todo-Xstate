@@ -57,20 +57,28 @@ const ListHandler = React.forwardRef<HTMLUListElement, Props>(
         <List ref={ref} pt="2" w="100%">
           {children.map((data, index) => (
             <ListItem
-              cursor="pointer"
-              onMouseEnter={(e) => {
+              _focus={{ backgroundColor: 'gray.100', color: 'Black' }}
+              onClick={(e) => {
                 e.currentTarget.focus();
               }}
+              cursor="pointer"
+              onMouseOver={(e) => {
+                e.currentTarget.focus();
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.blur();
+              }}
               tabIndex={index}
-              _hover={{ backgroundColor: 'gray.400' }}
-              _focus={{ backgroundColor: 'gray.400' }}
               key={index}
               onKeyDown={(e) => {
                 const eventTarget = e.target as HTMLInputElement;
                 if (e.keyCode === 40) {
                   const next = eventTarget.nextSibling as HTMLElement;
-                  if (!next) return;
-                  next.focus();
+                  if (!next) {
+                    return;
+                  } else {
+                    next.focus();
+                  }
                 } else if (e.keyCode === 38) {
                   const prev = eventTarget.previousSibling as HTMLElement;
                   if (prev) {
