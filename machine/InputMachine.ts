@@ -2,7 +2,7 @@ import { createMachine, assign } from 'xstate';
 
 interface CategoriesContext {
   text: string;
-  categorie: string;
+  category: string;
 }
 
 type CategoriesEvent =
@@ -11,18 +11,18 @@ type CategoriesEvent =
       value: string;
     }
   | {
-      type: 'TYPING_CATEGORIE';
+      type: 'TYPING_CATEGORY';
       value: string;
     }
   | {
-      type: 'SELECTING_CATEGORIE';
+      type: 'SELECTING_CATEGORY';
     };
 
 const inputMachine = createMachine<CategoriesContext, CategoriesEvent>({
   id: 'categoriesSelector',
   initial: 'start',
   context: {
-    categorie: '',
+    category: '',
     text: '',
   },
   states: {
@@ -33,17 +33,25 @@ const inputMachine = createMachine<CategoriesContext, CategoriesEvent>({
             text: (_, event) => event.value,
           }),
         },
-        TYPING_CATEGORIE: {
-          actions: assign({
-            categorie: (_, event) => event.value,
-          }),
+        TYPING_CATEGORY: {
           target: 'categoriesSelected',
         },
       },
     },
     categoriesSelected: {
       on: {
-        SELECTING_CATEGORIE: {
+        TYPING: {
+          actions: assign({
+            text: (_, event) => event.value,
+          }),
+          target: 'start',
+        },
+        TYPING_CATEGORY: {
+          actions: assign({
+            category: (_, event) => event.value,
+          }),
+        },
+        SELECTING_CATEGORY: {
           target: 'start',
           actions: assign({ text: (ctx) => ctx.text.replace('@', '') }),
         },

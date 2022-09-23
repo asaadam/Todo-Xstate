@@ -9,18 +9,50 @@ import { QuestionIcon } from '@chakra-ui/icons';
 import { useGlobalStore } from '../store/globalStore';
 
 export function CustomInput() {
-  const { categories } = useGlobalStore();
+  const { categories, addCategory } = useGlobalStore();
   const [stateInput, sendInput] = useMachine(inputMachine);
   const { service } = useCategories();
+  const filteredCategory = useSelector(
+    service,
+    (state) => state.context.categories
+  );
+
   const { send } = service;
   const inputRef = useRef(null);
   const ulRef = useRef(null);
 
   useEffect(() => {
-    if (stateInput.context.text.includes('@')) {
-      sendInput('TYPING_CATEGORIE', { value: '' });
+    if (categories) {
+      send('SET_CATEGORY', {
+        value: categories,
+      });
     }
-  }, [stateInput.context.text, sendInput]);
+  }, [categories, send]);
+
+  useEffect(() => {
+    if (stateInput.context.text?.includes('@')) {
+      const splitInput = stateInput.context.text.split('@');
+      if (!splitInput[1].includes(' ')) {
+        const filtered = categories.filter((val) => {
+          if (val.toLowerCase().indexOf(splitInput[1]) > -1) {
+            return val;
+          }
+        });
+        sendInput('TYPING_CATEGORY');
+        send('FILTER_CATEGORY', {
+          value: filtered,
+        });
+      }
+    } else {
+      sendInput('TYPING');
+    }
+  }, [
+    stateInput.context.text,
+    sendInput,
+    stateInput.context.category,
+    categories,
+    send,
+  ]);
 
   return (
     <form
@@ -57,25 +89,44 @@ export function CustomInput() {
         </HStack>
         {stateInput.value === 'categoriesSelected' && (
           <ListHandler ref={ulRef}>
-            {categories.map((val, index) => (
+            {!filteredCategory.length && (
               <Box
-                onClick={() => {
-                  send('SELECTED', {
-                    value: { selected: val, index: index },
-                  });
-                  sendInput('SELECTING_CATEGORIE');
-                  if (inputRef.current) {
-                    const currentRef = inputRef.current as HTMLElement;
-                    currentRef.focus();
-                  }
-                }}
-                w="100%"
                 p="4"
-                key={`${val} ${index}`}
+                onClick={() =>
+                  addCategory(stateInput.context.text.split('@')[1])
+                }
+                key={'newData'}
               >
-                <Text>{val}</Text>
+                <Text>
+                  Add{' '}
+                  <Text as={'span'} textColor={'red.400'}>
+                    {stateInput.context.text.split('@')[1]}{' '}
+                  </Text>
+                  to category
+                </Text>
               </Box>
-            ))}
+            )}
+            {filteredCategory.map((val, index) => {
+              return (
+                <Box
+                  onClick={() => {
+                    send('SELECTED', {
+                      value: { selected: val, index: index },
+                    });
+                    sendInput('SELECTING_CATEGORY');
+                    if (inputRef.current) {
+                      const currentRef = inputRef.current as HTMLElement;
+                      currentRef.focus();
+                    }
+                  }}
+                  w="100%"
+                  p="4"
+                  key={`${val} ${index}`}
+                >
+                  <Text>{val}</Text>
+                </Box>
+              );
+            })}
           </ListHandler>
         )}
       </Box>
