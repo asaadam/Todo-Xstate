@@ -6,17 +6,10 @@ import { useCategories } from '../store/categoriesStore';
 import { inputMachine } from '../machine/InputMachine';
 import { ListHandler } from './ListHandler';
 import { QuestionIcon } from '@chakra-ui/icons';
-
-const LIST_CATEGORIES = [
-  'Design',
-  'Programming',
-  'Marketing',
-  'Finance',
-  'Support',
-  'Sleep',
-];
+import { useGlobalStore } from '../store/globalStore';
 
 export function CustomInput() {
+  const { categories } = useGlobalStore();
   const [stateInput, sendInput] = useMachine(inputMachine);
   const { service } = useCategories();
   const { send } = service;
@@ -64,9 +57,9 @@ export function CustomInput() {
         </HStack>
         {stateInput.value === 'categoriesSelected' && (
           <ListHandler ref={ulRef}>
-            {LIST_CATEGORIES.map((val, index) => (
+            {categories.map((val, index) => (
               <Box
-                onClick={(e) => {
+                onClick={() => {
                   send('SELECTED', {
                     value: { selected: val, index: index },
                   });
