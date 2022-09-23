@@ -9,13 +9,11 @@ type Props = {
 };
 
 type TypeKeys = {
-  37: number;
   38: number;
-  39: number;
   40: number;
 };
 
-const keys: TypeKeys = { 37: 1, 38: 1, 39: 1, 40: 1 };
+const keys: TypeKeys = { 38: 1, 40: 1 };
 
 function preventDefaultForScrollKeys(e: KeyboardEvent) {
   const keyKode = e.keyCode as keyof TypeKeys;
