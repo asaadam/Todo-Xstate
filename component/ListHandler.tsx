@@ -1,10 +1,11 @@
 import { List, ListItem, VStack } from '@chakra-ui/react';
-import { useEffect } from 'react';
+import { MutableRefObject, useEffect } from 'react';
 import React from 'react';
 
 type Props = {
   children: Array<React.ReactNode>;
   defaultSelectedIndex?: number;
+  prevRef?: MutableRefObject<null>;
 };
 
 type TypeKeys = {
@@ -35,7 +36,7 @@ function enableScroll() {
 
 // eslint-disable-next-line react/display-name
 const ListHandler = React.forwardRef<HTMLUListElement, Props>(
-  ({ children, defaultSelectedIndex }, ref) => {
+  ({ children, defaultSelectedIndex, prevRef }, ref) => {
     useEffect(() => {
       const newRef = ref as React.RefObject<HTMLUListElement>;
       if (newRef && newRef?.current && defaultSelectedIndex !== undefined) {
@@ -76,6 +77,10 @@ const ListHandler = React.forwardRef<HTMLUListElement, Props>(
                   const prev = eventTarget.previousSibling as HTMLElement;
                   if (prev) {
                     prev.focus();
+                  } else if (prevRef) {
+                    const previousRef =
+                      prevRef.current as unknown as HTMLElement;
+                    previousRef.focus();
                   }
                 } else if (e.keyCode === 13) {
                   const children = e.currentTarget.childNodes[0] as HTMLElement;

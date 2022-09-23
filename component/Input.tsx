@@ -88,7 +88,7 @@ export function CustomInput() {
           </Tooltip>
         </HStack>
         {stateInput.value === 'categoriesSelected' && (
-          <ListHandler ref={ulRef}>
+          <ListHandler ref={ulRef} prevRef={inputRef}>
             {filteredCategory.length > 0
               ? filteredCategory.map((val, index) => {
                   return (
