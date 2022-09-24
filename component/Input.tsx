@@ -112,14 +112,14 @@ export function CustomInput() {
                       _hover={{ backgroundColor: 'gray.400' }}
                       _focus={{ backgroundColor: 'gray.400' }}
                       onClick={() => {
+                        if (inputRef.current) {
+                          const currentRef = inputRef.current as HTMLElement;
+                          setTimeout(() => currentRef.focus(), 0);
+                        }
                         send('SELECTED', {
                           value: { selected: val, index: index },
                         });
                         sendInput('SELECTING_CATEGORY');
-                        if (inputRef.current) {
-                          const currentRef = inputRef.current as HTMLElement;
-                          currentRef.focus();
-                        }
                       }}
                       w="100%"
                       p="4"
@@ -134,9 +134,14 @@ export function CustomInput() {
                     _hover={{ backgroundColor: 'gray.400' }}
                     _focus={{ backgroundColor: 'gray.400' }}
                     p="4"
-                    onClick={() =>
-                      addCategory(stateInput.context.text.split('@')[1])
-                    }
+                    onClick={() => {
+                      addCategory(stateInput.context.text.split('@')[1]);
+
+                      if (inputRef.current) {
+                        const currentRef = inputRef.current as HTMLElement;
+                        setTimeout(() => currentRef.focus(), 0);
+                      }
+                    }}
                     key={'newData'}
                   >
                     <Text>
